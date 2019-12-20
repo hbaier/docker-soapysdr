@@ -1,0 +1,50 @@
+FROM alpine:3.10 AS builder
+LABEL maintainer="Harald Baier <hbaier@users.noreply.github.com>"
+
+# build SoapySDR
+WORKDIR /opt
+RUN apk --no-cache add \
+    cmake \
+    doxygen \
+    g++ \
+    git \
+    make \
+    python-dev \
+    python3-dev \
+    swig \
+ && git clone https://github.com/pothosware/SoapySDR.git --depth 1 --branch soapy-sdr-0.7.1 \
+ && cd SoapySDR \
+ && mkdir build \
+ && cd build \
+ && cmake .. \
+ && make -j$(nproc) \
+ && make install \
+ && mkdir -p /tmp/artifacts \
+ && cp -r -P -p --parents \
+    /usr/local/ \
+    /tmp/artifacts/
+
+# strip artifacts
+RUN apk --no-cache add \
+    binutils \
+ && find /tmp/artifacts -type f -executable -exec strip -sp '{}' + || true
+
+# create artifacts tarball preserving symlinks
+RUN apk --no-cache add \
+    tar \
+ && tar -cvzpf /tmp/artifacts.tar.gz -C /tmp/artifacts .
+
+FROM alpine:3.10
+LABEL maintainer="Harald Baier <hbaier@gmx.net>"
+
+COPY --from=builder /tmp/artifacts.tar.gz /tmp/
+
+RUN apk --no-cache add \
+    libstdc++ \
+    tar \
+ && tar --same-owner -xvzf /tmp/artifacts.tar.gz -C / \
+ && rm -f /tmp/artifacts.tar.gz \
+ && apk --no-cache del \
+    tar
+
+ENTRYPOINT ["/bin/sh"]
