@@ -1,4 +1,6 @@
 # docker-soapysdr
+![][badge_build] ![][badge_docker_pull]
+
 Use a SoapySDRServer ([Soapy SDR](https://github.com/pothosware/SoapyRemote/wiki) remote support) within a Docker container.
 
 ## Usage
@@ -15,3 +17,6 @@ $ docker run -d -rm \
              --device=/dev/bus/usb/001/007 \
              soapysdr
 ```
+
+[badge_build]: https://github.com/hbaier/docker-soapysdr/workflows/docker-multiarch/badge.svg
+[badge_docker_pull]: https://img.shields.io/docker/pulls/hbaier/soapysdr
