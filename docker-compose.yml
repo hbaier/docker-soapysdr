@@ -3,11 +3,10 @@ services:
   soapysdr:
     build: .
     container_name: soapysdr
-    ports:
-      - "55132:55132/tcp"
     environment:
       SOAPY_REMOTE_IP_ADDRESS: [::]
       SOAPY_REMOTE_PORT: 55132
+    network_mode: host
     devices:
       - /dev/bus/usb/001/004:/dev/bus/usb/001/004
       - /dev/bus/usb/001/005:/dev/bus/usb/001/005
