@@ -1,7 +1,7 @@
 # docker-soapysdr
 [![GitHub Workflow Status][badge_build_image]][badge_build_link] [![Docker Pulls][badge_docker_pull_image]][badge_docker_pull_link]
 
-Use a SoapySDRServer (as a part of [SoapyRemote](https://github.com/pothosware/SoapyRemote/wiki)) within a Docker container.
+Use a SoapySDRServer (as part of [SoapyRemote](https://github.com/pothosware/SoapyRemote/wiki)) within a Docker container.
 
 ## Usage
 Start the server in the background:
