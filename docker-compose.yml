@@ -1,7 +1,7 @@
 version: "3"
 services:
   soapysdr:
-    build: .
+    image: hbaier/soapysdr
     container_name: soapysdr
     environment:
       SOAPY_REMOTE_IP_ADDRESS: [::]
