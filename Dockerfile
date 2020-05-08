@@ -1,22 +1,35 @@
 FROM ubuntu:focal
 LABEL maintainer="Harald Baier <hbaier@users.noreply.github.com>"
 
+ARG MYRIADRF_PPA_CODENAME=bionic
+ARG MYRIADRF_PPA_KEY=11FC2E68126782B43762694F22C627172ECB91FE
+
 ENV SOAPY_REMOTE_IP_ADDRESS=[::] \
     SOAPY_REMOTE_PORT=55132
 
 RUN apt-get update \
+ && apt-get install -y \
+    gnupg \
+ && echo "deb http://ppa.launchpad.net/myriadrf/drivers/ubuntu ${MYRIADRF_PPA_CODENAME} main" > /etc/apt/sources.list.d/myriadrf.list \
+ && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ${MYRIADRF_PPA_KEY} \
+ && printf '%s\n' 'Package: *' 'Pin: release o=LP-PPA-myriadrf-drivers' 'Pin-Priority: 100' > /etc/apt/preferences.d/myriadrf.pref \
+ && apt-get update \
  && apt-get install -y \
     avahi-daemon \
     dbus \
     gosu \
     soapyremote-server \
     soapysdr-module-airspy \
+    soapysdr-module-airspyhf \
     soapysdr-module-audio \
     soapysdr-module-bladerf \
+    soapysdr-module-fcdpp \
     soapysdr-module-hackrf \
+    soapysdr-module-iris \
     soapysdr-module-lms7 \
     soapysdr-module-mirisdr \
     soapysdr-module-osmosdr \
+    soapysdr-module-plutosdr \
     soapysdr-module-redpitaya \
     soapysdr-module-remote \
     soapysdr-module-rfspace \
@@ -24,6 +37,7 @@ RUN apt-get update \
     soapysdr-module-uhd \
     soapysdr-tools \
     supervisor \
+ && apt-get purge --autoremove -y gnupg \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/* \
  && mkdir -p /var/run/dbus \
