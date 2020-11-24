@@ -19,7 +19,6 @@ RUN apt-get update \
     soapysdr-module-osmosdr \
     soapysdr-module-redpitaya \
     soapysdr-module-remote \
-    soapysdr-module-rfspace \
     soapysdr-module-rtlsdr \
     soapysdr-module-uhd \
     soapysdr-tools \
@@ -28,50 +27,11 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/* \
  && mkdir -p /var/run/dbus \
  && groupadd -r soapysdr \
- && useradd --no-log-init -r -g soapysdr -s /usr/sbin/nologin soapysdr \
- && printf '%s\n' \
-    '#!/bin/sh' \
-    '' \
-    'set -e' \
-    '' \
-    'if avahi-daemon -c; then' \
-    '  exec gosu soapysdr /usr/bin/SoapySDRServer --bind="${SOAPY_REMOTE_IP_ADDRESS}:${SOAPY_REMOTE_PORT}"' \
-    'else' \
-    '  exit 1' \
-    'fi' > /usr/local/bin/soapysdr-helper.sh \
- && chmod 744 /usr/local/bin/soapysdr-helper.sh \
- && printf '%s\n' \
-    '[supervisord]' \
-    'user=root' \
-    'nodaemon=true' \
-    '' \
-    '[program:dbus]' \
-    'command=/usr/bin/dbus-daemon --system --nopidfile --nofork' \
-    'priority=100' \
-    'autorestart=true' \
-    'stdout_logfile=/proc/1/fd/1' \
-    'stdout_logfile_maxbytes=0' \
-    'stderr_logfile=/proc/1/fd/2' \
-    'stderr_logfile_maxbytes=0' \
-    '' \
-    '[program:avahi]' \
-    'command=/usr/sbin/avahi-daemon --no-chroot' \
-    'priority=200' \
-    'autorestart=true' \
-    'stdout_logfile=/proc/1/fd/1' \
-    'stdout_logfile_maxbytes=0' \
-    'stderr_logfile=/proc/1/fd/2' \
-    'stderr_logfile_maxbytes=0' \
-    '' \
-    '[program:soapysdr]' \
-    'command=/usr/local/bin/soapysdr-helper.sh' \
-    'priority=300' \
-    'stopsignal=INT' \
-    'autorestart=true' \
-    'stdout_logfile=/proc/1/fd/1' \
-    'stdout_logfile_maxbytes=0' \
-    'stderr_logfile=/proc/1/fd/2' \
-    'stderr_logfile_maxbytes=0' > /etc/supervisor/supervisord.conf
+ && useradd --no-log-init -r -g soapysdr -s /usr/sbin/nologin soapysdr
+
+COPY ./soapysdr-helper.sh /usr/local/bin
+COPY ./supervisord.conf /etc/supervisor
+RUN chmod 744 /usr/local/bin/soapysdr-helper.sh
 
 ENTRYPOINT ["/usr/bin/supervisord", "-c"]
 CMD ["/etc/supervisor/supervisord.conf"]
